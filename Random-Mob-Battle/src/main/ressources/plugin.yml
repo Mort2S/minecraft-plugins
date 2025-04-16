@@ -2,9 +2,9 @@ name: RandomMobBattle
 version: 1.0
 main: randommobbattle.RandomMobBattle
 api-version: 1.16
-description: Drops random items on block break and shows mob kill stats with spawn eggs.
+description: test
 
 commands:
   mobstats:
-    description: Zeigt dir deine Mob-Kills an
-    usage: /mobstats
+    description: test
+    usage: test
