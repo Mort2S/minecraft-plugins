@@ -5,12 +5,12 @@
                              
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>randommobbattle</groupId>
-    <artifactId>randommobbattle</artifactId>
+    <groupId>plugin</groupId>
+    <artifactId>plugin</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>RandomMobBattle</name>
+    <name>Plugin</name>
 
     <build>
         <resources>
@@ -19,7 +19,6 @@
             </resource>
         </resources>
         <plugins>
-            <!-- Java-Version und Compiler konfigurieren -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
