@@ -2,16 +2,10 @@ name: Atzen
 main: atzen.Atzen
 version: 1.0
 api-version: 1.20
-author: DeinName
+author: Morty
 description: Drops a consistent random item when a block is broken, with blacklist and reshuffle support.
 
 commands:
-  atzen:
-    description: Base command for managing drops
-    usage: /<command> randomizeAmount | reshuffleDrops | addBlacklistItem | removeBlacklistItem
-    permission: atzen.manage
-    permission-message: You don't have permission to use this command.
-
   atzen randomizeAmount:
     description: Toggle whether the amount of drops should be randomized
     usage: /atzen randomizeAmount [true|false]
