@@ -1,0 +1,7 @@
+blacklist:
+  - TNT
+  - COMMAND_BLOCK
+  - BARRIER
+  - STRUCTURE_VOID
+  - BEDROCK
+  - AIR
