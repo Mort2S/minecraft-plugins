@@ -1,5 +1,5 @@
+main: atzen.Atzen
 name: Atzen
 version: 1.0
-main: atzen.Atzen
 api-version: 1.20
-author: mort1s
+author: morty

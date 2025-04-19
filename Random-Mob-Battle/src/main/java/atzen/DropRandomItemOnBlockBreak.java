@@ -10,23 +10,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public class DropRandomItemOnBlockBreak extends JavaPlugin implements Listener {
+public class DropRandomItemOnBlockBreak implements Listener {
 
-    @Override
-    public void onEnable() {
-        this.saveDefaultConfig();
-        this.getServer().getPluginManager().registerEvents(this, this);
-    }
+    private final Atzen plugin;
 
-    @Override
-    public void onDisable() {
+    public DropRandomItemOnBlockBreak(Atzen plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        List<String> blacklist = this.getConfig().getStringList("blacklist");
+        List<String> blacklist = plugin.getConfig().getStringList("blacklist");
 
         Material[] allMaterials = Material.values();
         List<Material> validMaterials = new ArrayList<>();
