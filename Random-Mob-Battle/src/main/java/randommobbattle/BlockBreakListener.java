@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Random;
 
 public class BlockBreakListener implements Listener {
+
     private final Random random = new Random();
 
     @EventHandler
@@ -22,6 +23,9 @@ public class BlockBreakListener implements Listener {
             randomMaterial = possibleDrops[random.nextInt(possibleDrops.length)];
         } while (!randomMaterial.isItem());
 
-        player.getWorld().dropItemNaturally(event.getBlock().getLocation(), new ItemStack(randomMaterial, 1));
+        player.getWorld().dropItemNaturally(
+            event.getBlock().getLocation(),
+            new ItemStack(randomMaterial, 1)
+        );
     }
 }

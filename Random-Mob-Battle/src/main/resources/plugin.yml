@@ -1,0 +1,5 @@
+name: RandomMobBattle
+version: 1.0
+main: randommobbattle.RandomMobBattle
+api-version: 1.20
+author: mort1s
