@@ -1,12 +1,42 @@
-main: atzen.Atzen
 name: Atzen
+main: atzen.Atzen
 version: 1.0
 api-version: 1.20
-author: morty
+author: DeinName
+description: Drops a consistent random item when a block is broken, with blacklist and reshuffle support.
 
 commands:
   atzen:
-    description: Control the drop behavior
+    description: Base command for managing drops
+    usage: /<command> randomizeAmount | reshuffleDrops | addBlacklistItem | removeBlacklistItem
+    permission: atzen.manage
+    permission-message: You don't have permission to use this command.
+
+  atzen randomizeAmount:
+    description: Toggle whether the amount of drops should be randomized
     usage: /atzen randomizeAmount [true|false]
-    permission: atzen.toggle
-    permission-message: You do not have permission to use this command.
+    permission: atzen.manage
+    permission-message: You don't have permission to use this command.
+
+  atzen reshuffleDrops:
+    description: Reshuffle the drops for blocks
+    usage: /atzen reshuffleDrops
+    permission: atzen.manage
+    permission-message: You don't have permission to use this command.
+
+  atzen addBlacklistItem:
+    description: Add an item to the blacklist
+    usage: /atzen addBlacklistItem <item>
+    permission: atzen.manage
+    permission-message: You don't have permission to use this command.
+
+  atzen removeBlacklistItem:
+    description: Remove an item from the blacklist
+    usage: /atzen removeBlacklistItem <item>
+    permission: atzen.manage
+    permission-message: You don't have permission to use this command.
+
+permissions:
+  atzen.manage:
+    description: Allows access to all /atzen commands
+    default: op
