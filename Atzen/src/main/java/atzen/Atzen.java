@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Atzen extends JavaPlugin implements TabExecutor {
 
     private MobTrackerManager mobTrackerManager;
+    private TeamManager teamManager;
 
     @Override
     public void onEnable() {
@@ -33,6 +34,7 @@ public class Atzen extends JavaPlugin implements TabExecutor {
         getCommand("atzen").setTabCompleter(this);
 
         mobTrackerManager = new MobTrackerManager(this);
+        teamManager = new TeamManager(this);
     }
 
     @Override
@@ -77,6 +79,30 @@ public class Atzen extends JavaPlugin implements TabExecutor {
                 } else {
                     sender.sendMessage("§eNo drops were set yet, nothing to reshuffle.");
                 }
+                return true;
+
+            case "togglerandomdrops":
+                if (args.length == 1) {
+                    boolean currentVal = config.getBoolean("randomize-amount", false);
+                    sender.sendMessage("§eAktueller Wert von §6randomize-amount§e: " + currentVal);
+                    return true;
+                }
+
+                String value = args[1].toLowerCase(Locale.ROOT);
+                boolean newValue;
+
+                if (value.equals("true") || value.equals("1")) {
+                    newValue = true;
+                } else if (value.equals("false") || value.equals("0")) {
+                    newValue = false;
+                } else {
+                    sender.sendMessage("§cUngültiger Wert. Bitte nutze true/false oder 1/0.");
+                    return true;
+                }
+
+                config.set("randomize-amount", newValue);
+                saveConfig();
+                sender.sendMessage("§aDer Wert von §6randomize-amount§a wurde auf " + newValue + " gesetzt.");
                 return true;
 
             case "addblacklistitem":
@@ -154,6 +180,15 @@ public class Atzen extends JavaPlugin implements TabExecutor {
                 mobTrackerManager.openMobInventory(player2);
                 return true;
 
+            case "backpack":
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage("§cNur Spieler können diesen Befehl verwenden.");
+                    return true;
+                }
+
+                teamManager.openTeamBackpack(player);
+                return true;
+
             default:
                 sender.sendMessage("§cUnknown subcommand.");
                 return true;
@@ -174,7 +209,8 @@ public class Atzen extends JavaPlugin implements TabExecutor {
                     "removeBlacklistItem",
                     "toggleRandomDrops",
                     "mobTrackerStart",
-                    "mobTrackerList"
+                    "mobTrackerList",
+                    "backpack"
             );
         }
 
