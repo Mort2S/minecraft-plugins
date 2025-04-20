@@ -83,8 +83,8 @@ public class Atzen extends JavaPlugin implements TabExecutor {
 
             case "togglerandomdrops":
                 if (args.length == 1) {
-                    boolean currentVal = config.getBoolean("randomize-amount", false);
-                    sender.sendMessage("§eAktueller Wert von §6randomize-amount§e: " + currentVal);
+                    boolean currentVal = config.getBoolean("random-drops-enabled", false);
+                    sender.sendMessage("§eAktueller Wert von §6random-drops-enabled§e: " + currentVal);
                     return true;
                 }
 
@@ -100,9 +100,9 @@ public class Atzen extends JavaPlugin implements TabExecutor {
                     return true;
                 }
 
-                config.set("randomize-amount", newValue);
+                config.set("random-drops-enabled", newValue);
                 saveConfig();
-                sender.sendMessage("§aDer Wert von §6randomize-amount§a wurde auf " + newValue + " gesetzt.");
+                sender.sendMessage("§aDer Wert von §6random-drops-enabled§a wurde auf " + newValue + " gesetzt.");
                 return true;
 
             case "addblacklistitem":
