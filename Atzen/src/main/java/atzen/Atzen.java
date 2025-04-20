@@ -1,6 +1,5 @@
 package atzen;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -12,13 +11,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Atzen extends JavaPlugin implements TabExecutor {
 
+    private MobTrackerManager mobTrackerManager;
+
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        this.saveDefaultConfig();
+
+        getServer().getPluginManager().registerEvents(new DropRandomItemOnBlockBreak(this), this);
 
         if (!getConfig().contains("randomize-amount")) {
             getConfig().set("randomize-amount", false);
@@ -28,12 +32,14 @@ public class Atzen extends JavaPlugin implements TabExecutor {
         getCommand("atzen").setExecutor(this);
         getCommand("atzen").setTabCompleter(this);
 
-        getServer().getPluginManager().registerEvents(new DropRandomItemOnBlockBreak(this), this);
+        mobTrackerManager = new MobTrackerManager(this);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!label.equalsIgnoreCase("atzen")) return false;
+        if (!label.equalsIgnoreCase("atzen")) {
+            return false;
+        }
 
         FileConfiguration config = getConfig();
 
@@ -41,7 +47,6 @@ public class Atzen extends JavaPlugin implements TabExecutor {
             sender.sendMessage("§eAvailable subcommands: /atzen randomizeAmount [true|false], reshuffleDrops, addBlacklistItem <item>, removeBlacklistItem <item>");
             return true;
         }
-
         switch (args[0].toLowerCase(Locale.ROOT)) {
             case "randomizeamount":
                 if (args.length == 1) {
@@ -96,7 +101,6 @@ public class Atzen extends JavaPlugin implements TabExecutor {
                 blacklist.add(addItem);
                 config.set("blacklist", blacklist);
 
-                // Remove drops that would result in this item
                 if (config.contains("drops")) {
                     Map<String, Object> drops = config.getConfigurationSection("drops").getValues(false);
                     drops.entrySet().removeIf(entry -> addItem.equals(entry.getValue()));
@@ -127,6 +131,29 @@ public class Atzen extends JavaPlugin implements TabExecutor {
                 sender.sendMessage("§a" + remItem + " has been removed from the blacklist.");
                 return true;
 
+            case "mobtrackerstart":
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage("§cNur Spieler können das ausführen.");
+                    return true;
+                }
+
+                if (args.length != 2) {
+                    player.sendMessage("§cVerwendung: /atzen mobTrackerStart <Dauer> (z. B. 30s oder 5m)");
+                    return true;
+                }
+
+                mobTrackerManager.startTracking(player, args[1]);
+                return true;
+
+            case "mobtrackerlist":
+                if (!(sender instanceof Player player2)) {
+                    sender.sendMessage("§cNur Spieler können das ausführen.");
+                    return true;
+                }
+
+                mobTrackerManager.openMobInventory(player2);
+                return true;
+
             default:
                 sender.sendMessage("§cUnknown subcommand.");
                 return true;
@@ -135,22 +162,20 @@ public class Atzen extends JavaPlugin implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (!command.getName().equalsIgnoreCase("atzen")) return null;
-
-        if (args.length == 1) {
-            return Arrays.asList("randomizeAmount", "reshuffleDrops", "addBlacklistItem", "removeBlacklistItem");
+        if (!command.getName().equalsIgnoreCase("atzen")) {
+            return null;
         }
 
-        if (args.length == 2 && (args[0].equalsIgnoreCase("addBlacklistItem") || args[0].equalsIgnoreCase("removeBlacklistItem"))) {
-            List<String> matches = new ArrayList<>();
-            for (Material mat : Material.values()) {
-                if (!mat.isItem()) continue;
-                String name = "minecraft:" + mat.name().toLowerCase();
-                if (name.startsWith(args[1].toLowerCase())) {
-                    matches.add(name);
-                }
-            }
-            return matches;
+        if (args.length == 1) {
+            return Arrays.asList(
+                    "randomizeAmount",
+                    "reshuffleDrops",
+                    "addBlacklistItem",
+                    "removeBlacklistItem",
+                    "toggleRandomDrops",
+                    "mobTrackerStart",
+                    "mobTrackerList"
+            );
         }
 
         return Collections.emptyList();

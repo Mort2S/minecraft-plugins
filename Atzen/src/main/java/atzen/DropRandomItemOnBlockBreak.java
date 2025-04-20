@@ -21,6 +21,10 @@ public class DropRandomItemOnBlockBreak implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
+        if (!plugin.getConfig().getBoolean("random-drops-enabled", true)) {
+            return;
+        }
+
         FileConfiguration config = plugin.getConfig();
 
         String blockName = event.getBlock().getType().name();
