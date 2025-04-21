@@ -35,6 +35,14 @@ public class Atzen extends JavaPlugin implements TabExecutor {
 
         mobTrackerManager = new MobTrackerManager(this);
         teamManager = new TeamManager(this);
+        teamManager.loadBackpacks();
+    }
+
+    @Override
+    public void onDisable() {
+        if (teamManager != null) {
+            teamManager.saveBackpacks();
+        }
     }
 
     @Override
