@@ -1,0 +1,28 @@
+name: PlayerBackpacks
+version: 1.0
+main: de.morty.backpacks.BackpackPlugin
+api-version: 1.20
+
+commands:
+  backpack:
+    description: Öffnet dein Backpack oder das eines anderen Spielers
+    usage: /backpack [Spieler]
+    permission: backpacks.use
+
+  setbackpacksize:
+    description: Setzt die Größe des Backpacks für einen Spieler
+    usage: /setbackpacksize <Spieler> <Größe>
+    permission: backpacks.setsize
+
+permissions:
+  backpacks.use:
+    description: Erlaubt die Nutzung des /backpack-Befehls
+    default: true
+
+  backpacks.others:
+    description: Erlaubt Zugriff auf Backpacks anderer Spieler über /backpack <Spieler>
+    default: op
+
+  backpacks.setsize:
+    description: Erlaubt das Setzen von Backpack-Größen
+    default: op
