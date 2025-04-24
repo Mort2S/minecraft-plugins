@@ -23,6 +23,7 @@ public class BackpackManager implements Listener {
     private final BackpackPlugin plugin;
     private final Map<UUID, Inventory> openInventories = new HashMap<>();
     private final Map<UUID, Integer> playerBackpackSizes = new HashMap<>();
+    private final Map<UUID, String> inventoryTitles = new HashMap<>();
 
     public BackpackManager(BackpackPlugin plugin) {
         this.plugin = plugin;
@@ -45,9 +46,12 @@ public class BackpackManager implements Listener {
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         List<ItemStack> items = (List<ItemStack>) config.getList("backpacks." + uuid + ".items");
-        if (items == null) items = new ArrayList<>();
+        if (items == null) {
+            items = new ArrayList<>();
+        }
 
-        Inventory inv = Bukkit.createInventory(null, size, "Backpack von " + player.getName());
+        String title = getBackpackTitle(player);
+        Inventory inv = Bukkit.createInventory(null, size, title);
         ItemStack[] contents = new ItemStack[size];
         for (int i = 0; i < size && i < items.size(); i++) {
             contents[i] = items.get(i);
@@ -55,6 +59,8 @@ public class BackpackManager implements Listener {
         inv.setContents(contents);
 
         openInventories.put(uuid, inv);
+        inventoryTitles.put(uuid, title);
+
         return inv;
     }
 
@@ -111,7 +117,9 @@ public class BackpackManager implements Listener {
 
     private void loadSizes() {
         File file = new File(plugin.getDataFolder(), "sizes.yml");
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            return;
+        }
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         for (String key : config.getKeys(false)) {
@@ -124,12 +132,22 @@ public class BackpackManager implements Listener {
         }
     }
 
+    private String getBackpackTitle(Player player) {
+        String template = plugin.getConfig().getString("backpack-title", "Backpack von %player%");
+        return template.replace("%player%", player.getName());
+    }
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        UUID uuid = event.getPlayer().getUniqueId();
+        Player player = (Player) event.getPlayer();
+        UUID uuid = player.getUniqueId();
         Inventory inv = event.getInventory();
-        openInventories.put(uuid, inv);
-        saveBackpack(uuid, inv);
+
+        if (inventoryTitles.containsKey(uuid) && event.getView().getTitle().equals(inventoryTitles.get(uuid))) {
+            saveBackpack(uuid, inv);
+            openInventories.remove(uuid);
+            inventoryTitles.remove(uuid);
+        }
     }
 
     private void saveBackpack(UUID uuid, Inventory inventory) {
