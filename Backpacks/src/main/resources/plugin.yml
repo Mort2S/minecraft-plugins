@@ -14,6 +14,12 @@ commands:
     usage: /setbackpacksize <Spieler> <Größe>
     permission: backpacks.setsize
 
+  teambackpack:
+    description: Öffnet das Team-Backpack eines bestimmten Teams.
+    usage: /teambackpack <teamname>
+    permission: backpack.teambackpack
+    permission-message: Du hast keine Berechtigung, das Team-Backpack zu öffnen.
+
 permissions:
   backpacks.use:
     description: Erlaubt die Nutzung des /backpack-Befehls
@@ -25,4 +31,8 @@ permissions:
 
   backpacks.setsize:
     description: Erlaubt das Setzen von Backpack-Größen
+    default: op
+
+  backpack.teambackpack:
+    description: Erlaubt den Zugriff auf das Team-Backpack
     default: op

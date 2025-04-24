@@ -35,14 +35,14 @@ public class SetBackpackSizeCommand implements CommandExecutor {
 
         int size;
         try {
-            size = Integer.parseInt(args[1]);
+            int sizeOption = Integer.parseInt(args[1]);
+            if (sizeOption < 1 || sizeOption > 6) {
+                sender.sendMessage("§cDie Größe muss zwischen 1 und 6 liegen.");
+                return true;
+            }
+            size = sizeOption * 9;
         } catch (NumberFormatException e) {
             sender.sendMessage("§cUngültige Zahl.");
-            return true;
-        }
-
-        if (size % 9 != 0 || size < 9 || size > 54) {
-            sender.sendMessage("§cGröße muss durch 9 teilbar und zwischen 9 und 54 sein.");
             return true;
         }
 
