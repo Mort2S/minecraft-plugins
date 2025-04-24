@@ -26,6 +26,7 @@ public class BackpackManager implements Listener {
 
     public BackpackManager(BackpackPlugin plugin) {
         this.plugin = plugin;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
         loadSizes();
     }
 
@@ -34,14 +35,24 @@ public class BackpackManager implements Listener {
         int size = playerBackpackSizes.getOrDefault(uuid, 27);
 
         File file = new File(plugin.getDataFolder(), "backpacks.yml");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         List<ItemStack> items = (List<ItemStack>) config.getList("backpacks." + uuid + ".items");
         if (items == null) items = new ArrayList<>();
 
         Inventory inv = Bukkit.createInventory(null, size, "Backpack von " + player.getName());
-        for (int i = 0; i < size; i++) {
-            if (i < items.size()) inv.setItem(i, items.get(i));
+        ItemStack[] contents = new ItemStack[size];
+        for (int i = 0; i < size && i < items.size(); i++) {
+            contents[i] = items.get(i);
         }
+        inv.setContents(contents);
 
         openInventories.put(uuid, inv);
         return inv;
@@ -54,13 +65,20 @@ public class BackpackManager implements Listener {
 
     public void saveAll() {
         File file = new File(plugin.getDataFolder(), "backpacks.yml");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         for (Map.Entry<UUID, Inventory> entry : openInventories.entrySet()) {
             UUID uuid = entry.getKey();
             Inventory inv = entry.getValue();
-            List<ItemStack> items = Arrays.asList(inv.getContents());
-            config.set("backpacks." + uuid + ".items", items);
+            config.set("backpacks." + uuid + ".items", Arrays.asList(inv.getContents()));
         }
 
         try {
@@ -72,6 +90,14 @@ public class BackpackManager implements Listener {
 
     private void saveSizes() {
         File file = new File(plugin.getDataFolder(), "sizes.yml");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         YamlConfiguration config = new YamlConfiguration();
         for (Map.Entry<UUID, Integer> entry : playerBackpackSizes.entrySet()) {
             config.set(entry.getKey().toString(), entry.getValue());
@@ -86,6 +112,7 @@ public class BackpackManager implements Listener {
     private void loadSizes() {
         File file = new File(plugin.getDataFolder(), "sizes.yml");
         if (!file.exists()) return;
+
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         for (String key : config.getKeys(false)) {
             try {
@@ -100,8 +127,27 @@ public class BackpackManager implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
-        if (openInventories.containsKey(uuid)) {
-            openInventories.put(uuid, event.getInventory());
+        Inventory inv = event.getInventory();
+        openInventories.put(uuid, inv);
+        saveBackpack(uuid, inv);
+    }
+
+    private void saveBackpack(UUID uuid, Inventory inventory) {
+        File file = new File(plugin.getDataFolder(), "backpacks.yml");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+        config.set("backpacks." + uuid + ".items", Arrays.asList(inventory.getContents()));
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

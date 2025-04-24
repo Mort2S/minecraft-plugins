@@ -17,12 +17,12 @@ public class BackpackPlugin extends JavaPlugin {
         getCommand("setbackpacksize").setExecutor(new SetBackpackSizeCommand(backpackManager));
     }
 
-@Override
-public void onDisable() {
-    if (backpackManager != null) {
-        backpackManager.saveAll();
+    @Override
+    public void onDisable() {
+        if (backpackManager != null) {
+            backpackManager.saveAll();
+        }
     }
-}
 
     public static BackpackPlugin getInstance() {
         return instance;
