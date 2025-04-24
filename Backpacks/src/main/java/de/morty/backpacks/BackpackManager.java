@@ -26,7 +26,7 @@ public class BackpackManager implements Listener {
 
     public BackpackManager(BackpackPlugin plugin) {
         this.plugin = plugin;
-        loadAllBackpacks();
+        loadSizes();
     }
 
     public Inventory getBackpack(Player player) {
@@ -36,79 +36,76 @@ public class BackpackManager implements Listener {
         File file = new File(plugin.getDataFolder(), "backpacks.yml");
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         List<ItemStack> items = (List<ItemStack>) config.getList("backpacks." + uuid + ".items");
-        if (items == null) {
-            items = new ArrayList<>();
-        }
+        if (items == null) items = new ArrayList<>();
 
         Inventory inv = Bukkit.createInventory(null, size, "Backpack von " + player.getName());
-
-        ItemStack[] contents = new ItemStack[size];
-        for (int i = 0; i < Math.min(size, items.size()); i++) {
-            contents[i] = items.get(i);
+        for (int i = 0; i < size; i++) {
+            if (i < items.size()) inv.setItem(i, items.get(i));
         }
 
-        inv.setContents(contents);
         openInventories.put(uuid, inv);
         return inv;
     }
 
     public void setSize(Player player, int size) {
         playerBackpackSizes.put(player.getUniqueId(), size);
-        saveBackpack(player);
+        saveSizes();
     }
 
-    public void saveBackpack(Player player) {
-        UUID uuid = player.getUniqueId();
-        Inventory inv = openInventories.get(uuid);
-        if (inv == null) {
-            return;
-        }
-
+    public void saveAll() {
         File file = new File(plugin.getDataFolder(), "backpacks.yml");
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-        config.set("backpacks." + uuid + ".items", Arrays.asList(inv.getContents()));
-        config.set("backpacks." + uuid + ".size", inv.getSize());
+        for (Map.Entry<UUID, Inventory> entry : openInventories.entrySet()) {
+            UUID uuid = entry.getKey();
+            Inventory inv = entry.getValue();
+            List<ItemStack> items = Arrays.asList(inv.getContents());
+            config.set("backpacks." + uuid + ".items", items);
+        }
 
         try {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        openInventories.remove(uuid);
     }
 
-    public void saveAll() {
-        for (UUID uuid : new ArrayList<>(openInventories.keySet())) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                saveBackpack(player);
-            }
+    private void saveSizes() {
+        File file = new File(plugin.getDataFolder(), "sizes.yml");
+        YamlConfiguration config = new YamlConfiguration();
+        for (Map.Entry<UUID, Integer> entry : playerBackpackSizes.entrySet()) {
+            config.set(entry.getKey().toString(), entry.getValue());
+        }
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private void loadAllBackpacks() {
-        File file = new File(plugin.getDataFolder(), "backpacks.yml");
-        if (!file.exists()) {
-            return;
-        }
-
+    private void loadSizes() {
+        File file = new File(plugin.getDataFolder(), "sizes.yml");
+        if (!file.exists()) return;
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-        if (!config.contains("backpacks")) {
-            return;
-        }
-
-        for (String uuidString : config.getConfigurationSection("backpacks").getKeys(false)) {
-            UUID uuid = UUID.fromString(uuidString);
-            int size = config.getInt("backpacks." + uuid + ".size", 27);
-            playerBackpackSizes.put(uuid, size);
+        for (String key : config.getKeys(false)) {
+            try {
+                UUID uuid = UUID.fromString(key);
+                int size = config.getInt(key);
+                playerBackpackSizes.put(uuid, size);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        saveBackpack(player);
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (openInventories.containsKey(uuid)) {
+            openInventories.put(uuid, event.getInventory());
+        }
+    }
+
+    public Inventory getCachedInventory(Player player) {
+        return openInventories.get(player.getUniqueId());
     }
 }

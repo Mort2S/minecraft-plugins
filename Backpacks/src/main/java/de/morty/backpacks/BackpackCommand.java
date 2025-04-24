@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 public class BackpackCommand implements CommandExecutor {
 
@@ -41,8 +42,14 @@ public class BackpackCommand implements CommandExecutor {
                 return true;
             }
 
+            Inventory targetInventory = manager.getCachedInventory(target);
+            if (targetInventory == null) {
+                targetInventory = manager.getBackpack(target);
+            }
+
             if (sender instanceof Player) {
-                ((Player) sender).openInventory(manager.getBackpack(target));
+                ((Player) sender).openInventory(targetInventory);
+                sender.sendMessage("§aBackpack von " + target.getName() + " geöffnet.");
             } else {
                 sender.sendMessage("§aBackpack von " + target.getName() + " geladen.");
             }
