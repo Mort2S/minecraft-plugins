@@ -21,7 +21,7 @@ public class TeamBackpackCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Nur Spieler können diesen Befehl ausführen.");
+            sender.sendMessage("");
             return true;
         }
 
@@ -39,7 +39,7 @@ public class TeamBackpackCommand implements CommandExecutor {
         } else {
             teamName = args[0];
             if (!player.isOp()) {
-                player.sendMessage("Nur Operatoren dürfen auf andere Team-Backpacks zugreifen.");
+                player.sendMessage("Nur Admins dürfen auf andere Team-Backpacks zugreifen.");
                 return true;
             }
         }

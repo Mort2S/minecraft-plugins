@@ -21,7 +21,7 @@ public class BackpackCommand implements CommandExecutor {
 
         if (args.length == 0) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage("§cNur Spieler können ihr eigenes Backpack öffnen.");
+                sender.sendMessage("");
                 return true;
             }
 
