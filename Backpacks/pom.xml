@@ -5,12 +5,12 @@
                              
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>Backpacks</groupId>
-    <artifactId>Backpacks</artifactId>
+    <groupId>de.morty.plugins</groupId>
+    <artifactId>playerbackpacks</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>Backpacks</name>
+    <name>PlayerBackpacks</name>
 
     <build>
         <resources>
